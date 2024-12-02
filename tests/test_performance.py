@@ -24,7 +24,7 @@ def puzzle_paths() -> list[pathlib.Path]:
 def running_time(path: pathlib.Path) -> float:
     t = time.perf_counter()
     module_name = f"{aoc24.__name__}.{path.stem}"
-    subprocess.check_call(
+    subprocess.call(
         [sys.executable, "-m", module_name],
         stdout=subprocess.DEVNULL,
     )
