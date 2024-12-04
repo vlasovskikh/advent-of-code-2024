@@ -1,3 +1,4 @@
+from __future__ import annotations
 import dataclasses
 import itertools
 import os
@@ -35,6 +36,12 @@ def split_by_empty_lines(lines: list[str]) -> list[list[str]]:
 class Coord(typing.NamedTuple):
     line: int
     pos: int
+
+    def add(self, other: Coord) -> Coord:
+        return Coord(self.line + other.line, self.pos + other.pos)
+
+    def sub(self, other: Coord) -> Coord:
+        return Coord(self.line - other.line, self.pos - other.pos)
 
 
 @dataclasses.dataclass
@@ -95,3 +102,7 @@ class Grid[T]:
 
     def __str__(self) -> str:
         return "\n".join("".join(str(x) for x in line) for line in self.data)
+
+    def __contains__(self, coord: Coord) -> bool:
+        lines, positions = self.size()
+        return 0 <= coord.line < lines and 0 <= coord.pos < positions
