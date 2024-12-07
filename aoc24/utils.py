@@ -43,6 +43,9 @@ class Coord(typing.NamedTuple):
     def sub(self, other: Coord) -> Coord:
         return Coord(self.line - other.line, self.pos - other.pos)
 
+    def __repr__(self) -> str:
+        return f"({self.line!r}, {self.pos!r})"
+
 
 @dataclasses.dataclass
 class Grid[T]:
