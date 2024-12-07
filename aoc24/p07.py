@@ -1,7 +1,9 @@
+import functools
 import itertools
 import math
 import operator
 import typing
+from concurrent import futures
 
 
 from aoc24 import utils
@@ -36,8 +38,16 @@ def total_calibration_result(equations: list[Equation]) -> int:
 
 
 def total_concat_result(equations: list[Equation]) -> int:
-    possible_ops = [operator.mul, operator.add, concat]
-    return sum(e.result for e in equations if is_solvable(e, possible_ops))
+    with futures.ProcessPoolExecutor() as executor:
+        s = 0
+        f = functools.partial(
+            is_solvable,
+            possible_ops=[operator.mul, operator.add, concat],
+        )
+        for e, solvable in zip(equations, executor.map(f, equations)):
+            if solvable:
+                s += e.result
+        return s
 
 
 def parse_input(lines: list[str]) -> list[Equation]:
