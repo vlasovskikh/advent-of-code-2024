@@ -5,8 +5,8 @@ from aoc24 import utils
 
 class WordGrid(utils.Grid[str]):
     def extrapolate(self, x1: utils.Coord, x2: utils.Coord) -> utils.Coord | None:
-        diff = x2.sub(x1)
-        x3 = x2.add(diff)
+        diff = utils.sub_coord(x2, x1)
+        x3 = utils.add_coord(x2, diff)
         return x3 if x3 in self else None
 
 

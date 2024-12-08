@@ -33,18 +33,15 @@ def split_by_empty_lines(lines: list[str]) -> list[list[str]]:
     return [list(g) for k, g in itertools.groupby(lines, key=bool) if k]
 
 
-class Coord(typing.NamedTuple):
-    line: int
-    pos: int
+type Coord = tuple[int, int]
 
-    def add(self, other: Coord) -> Coord:
-        return Coord(self.line + other.line, self.pos + other.pos)
 
-    def sub(self, other: Coord) -> Coord:
-        return Coord(self.line - other.line, self.pos - other.pos)
+def add_coord(x: Coord, y: Coord) -> Coord:
+    return x[0] + y[0], x[1] + y[1]
 
-    def __repr__(self) -> str:
-        return f"({self.line!r}, {self.pos!r})"
+
+def sub_coord(x: Coord, y: Coord) -> Coord:
+    return x[0] - y[0], x[1] - y[1]
 
 
 @dataclasses.dataclass
@@ -55,20 +52,20 @@ class Grid[T]:
     _size: Coord = dataclasses.field(init=False)
 
     def __post_init__(self) -> None:
-        self._size = Coord(len(self.data), len(self.data[0]))
+        self._size = len(self.data), len(self.data[0])
 
     def size(self) -> Coord:
         return self._size
 
     def lines(self) -> list[list[Coord]]:
         return [
-            [Coord(line, pos) for pos in range(len(self.data[line]))]
+            [(line, pos) for pos in range(len(self.data[line]))]
             for line in range(len(self.data))
         ]
 
     def positions(self) -> list[list[Coord]]:
         return [
-            [Coord(line, pos) for line in range(len(self.data))]
+            [(line, pos) for line in range(len(self.data))]
             for pos in range(len(self.data[0]))
         ]
 
@@ -78,38 +75,41 @@ class Grid[T]:
     def cross_neighbors(self, coord: Coord) -> list[Coord]:
         results = []
         for line, pos in [
-            (coord.line, coord.pos - 1),
-            (coord.line, coord.pos + 1),
-            (coord.line - 1, coord.pos),
-            (coord.line + 1, coord.pos),
+            (coord[0], coord[1] - 1),
+            (coord[0], coord[1] + 1),
+            (coord[0] - 1, coord[1]),
+            (coord[0] + 1, coord[1]),
         ]:
-            if 0 <= line < len(self.data) and 0 <= pos < len(self.data[coord.line]):
-                results.append(Coord(line, pos))
+            if 0 <= line < len(self.data) and 0 <= pos < len(self.data[coord[0]]):
+                results.append((line, pos))
         return results
 
     def diagonal_neighbors(self, coord: Coord) -> list[Coord]:
         return [
-            Coord(line, pos)
+            (line, pos)
             for line, pos in [
-                (coord.line - 1, coord.pos - 1),
-                (coord.line - 1, coord.pos + 1),
-                (coord.line + 1, coord.pos - 1),
-                (coord.line + 1, coord.pos + 1),
+                (coord[0] - 1, coord[1] - 1),
+                (coord[0] - 1, coord[1] + 1),
+                (coord[0] + 1, coord[1] - 1),
+                (coord[0] + 1, coord[1] + 1),
             ]
-            if 0 <= line < len(self.data) and 0 <= pos < len(self.data[coord.line])
+            if 0 <= line < len(self.data) and 0 <= pos < len(self.data[coord[0]])
         ]
 
     def __getitem__(self, coord: Coord) -> T:
-        return self.data[coord.line][coord.pos]
+        return self.data[coord[0]][coord[1]]
+
+    def __setitem__(self, coord: Coord, value: T) -> None:
+        self.data[coord[0]][coord[1]] = value
 
     def __iter__(self) -> typing.Iterator[Coord]:
         for line in range(len(self.data)):
             for pos in range(len(self.data[line])):
-                yield Coord(line, pos)
+                yield line, pos
 
     def __str__(self) -> str:
         return "\n".join("".join(str(x) for x in line) for line in self.data)
 
     def __contains__(self, coord: Coord) -> bool:
         lines, positions = self.size()
-        return 0 <= coord.line < lines and 0 <= coord.pos < positions
+        return 0 <= coord[0] < lines and 0 <= coord[1] < positions

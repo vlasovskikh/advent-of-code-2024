@@ -1,6 +1,5 @@
 from __future__ import annotations
 import enum
-import typing
 import copy
 
 from aoc24 import utils
@@ -43,12 +42,7 @@ class Dir(enum.Enum):
                 return "<"
 
 
-class Pos(typing.NamedTuple):
-    coord: utils.Coord
-    direction: Dir
-
-    def __repr__(self) -> str:
-        return f"({self.coord!r}, {self.direction!r})"
+type Pos = tuple[utils.Coord, Dir]
 
 
 class Lab(utils.Grid[Tile]):
@@ -59,13 +53,15 @@ class Lab(utils.Grid[Tile]):
         c, d = pos
         match d:
             case Dir.UP:
-                return self.step_in_dir(c, d, utils.Coord(c.line - 1, c.pos))
+                return self.step_in_dir(c, d, (c[0] - 1, c[1]))
             case Dir.RIGHT:
-                return self.step_in_dir(c, d, utils.Coord(c.line, c.pos + 1))
+                return self.step_in_dir(c, d, (c[0], c[1] + 1))
             case Dir.DOWN:
-                return self.step_in_dir(c, d, utils.Coord(c.line + 1, c.pos))
+                return self.step_in_dir(c, d, (c[0] + 1, c[1]))
             case Dir.LEFT:
-                return self.step_in_dir(c, d, utils.Coord(c.line, c.pos - 1))
+                return self.step_in_dir(c, d, (c[0], c[1] - 1))
+            case _:
+                raise ValueError(f"Unknown direction: {d}")
 
     def step_in_dir(
         self, coord: utils.Coord, direction: Dir, new_coord: utils.Coord
@@ -74,12 +70,12 @@ class Lab(utils.Grid[Tile]):
             direction = direction.turn90
         else:
             coord = new_coord
-        return Pos(coord, direction)
+        return coord, direction
 
     def path(self, pos: Pos) -> tuple[list[Pos], bool]:
         result: list[Pos] = []
         visited: set[Pos] = set()
-        while pos.coord in self and pos not in visited:
+        while pos[0] in self and pos not in visited:
             result.append(pos)
             visited.add(pos)
             pos = self.step(pos)
@@ -87,7 +83,7 @@ class Lab(utils.Grid[Tile]):
 
 
 def guard_path(lab: Lab) -> list[Pos]:
-    path, _ = lab.path(Pos(lab.find_guard(), Dir.UP))
+    path, _ = lab.path((lab.find_guard(), Dir.UP))
     return path
 
 
@@ -99,20 +95,20 @@ def count_looping_obstacles(
     visited: set[utils.Coord] = set()
     new_lab = copy.deepcopy(lab)
     for pos in path:
-        visited.add(pos.coord)
-        new_obstacle = lab.step(pos).coord
+        visited.add(pos[0])
+        new_obstacle = lab.step(pos)[0]
         if (
             new_obstacle in lab
             and new_obstacle not in visited
             and lab[new_obstacle] != Tile.OBSTACLE
         ):
-            new_lab.data[new_obstacle.line][new_obstacle.pos] = Tile.OBSTACLE
+            new_lab[new_obstacle] = Tile.OBSTACLE
             try:
                 _, loop = new_lab.path(pos)
                 if loop:
                     obstacles += 1
             finally:
-                new_lab.data[new_obstacle.line][new_obstacle.pos] = lab[new_obstacle]
+                new_lab[new_obstacle] = lab[new_obstacle]
     return obstacles
 
 
