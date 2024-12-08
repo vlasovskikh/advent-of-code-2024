@@ -43,7 +43,7 @@ def test_performance(puzzle: str, puzzle_runs: dict[str, float]) -> None:
     no_outliers = {
         p: t
         for p, t in puzzle_runs.items()
-        if abs(t - statistics.mean(times)) <= statistics.stdev(times)
+        if abs(t - statistics.mean(times)) <= 2 * statistics.stdev(times)
     }
     if len(no_outliers) < 2:
         return
