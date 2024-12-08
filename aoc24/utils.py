@@ -52,9 +52,13 @@ class Grid[T]:
     """2D grid of tiles suitable for maze-like puzzles."""
 
     data: list[list[T]]
+    _size: Coord = dataclasses.field(init=False)
+
+    def __post_init__(self) -> None:
+        self._size = Coord(len(self.data), len(self.data[0]))
 
     def size(self) -> Coord:
-        return Coord(len(self.data), len(self.data[0]))
+        return self._size
 
     def lines(self) -> list[list[Coord]]:
         return [

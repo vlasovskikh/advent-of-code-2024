@@ -55,18 +55,21 @@ class Lab(utils.Grid[Tile]):
     def find_guard(self) -> utils.Coord:
         return next(coord for coord in self if self[coord] == Tile.GUARD)
 
-    def step(
-        self,
-        pos: Pos,
+    def step(self, pos: Pos) -> Pos:
+        c, d = pos
+        match d:
+            case Dir.UP:
+                return self.step_in_dir(c, d, utils.Coord(c.line - 1, c.pos))
+            case Dir.RIGHT:
+                return self.step_in_dir(c, d, utils.Coord(c.line, c.pos + 1))
+            case Dir.DOWN:
+                return self.step_in_dir(c, d, utils.Coord(c.line + 1, c.pos))
+            case Dir.LEFT:
+                return self.step_in_dir(c, d, utils.Coord(c.line, c.pos - 1))
+
+    def step_in_dir(
+        self, coord: utils.Coord, direction: Dir, new_coord: utils.Coord
     ) -> Pos:
-        coord, direction = pos
-        steps: dict[Dir, utils.Coord] = {
-            Dir.UP: utils.Coord(coord.line - 1, coord.pos),
-            Dir.RIGHT: utils.Coord(coord.line, coord.pos + 1),
-            Dir.DOWN: utils.Coord(coord.line + 1, coord.pos),
-            Dir.LEFT: utils.Coord(coord.line, coord.pos - 1),
-        }
-        new_coord = steps[direction]
         if new_coord in self and self[new_coord] == Tile.OBSTACLE:
             direction = direction.turn90
         else:
