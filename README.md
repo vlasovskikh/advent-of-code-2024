@@ -7,66 +7,72 @@ Having winter fun with Advent of Code 2024 ☃️
 $ poetry run pre-commit run -av
 black....................................................................Passed
 - hook id: black
-- duration: 0.3s
+- duration: 0.31s
 
 All done! ✨ 🍰 ✨
-21 files left unchanged.
+27 files left unchanged.
 
 flake8...................................................................Passed
 - hook id: flake8
-- duration: 0.28s
+- duration: 0.29s
 mypy.....................................................................Passed
 - hook id: mypy
-- duration: 2.04s
+- duration: 2.1s
 
-Success: no issues found in 21 source files
+Success: no issues found in 27 source files
 
 pytest...................................................................Passed
 - hook id: pytest
-- duration: 1.09s
+- duration: 1.1s
 
 ============================= test session starts ==============================
 platform linux -- Python 3.13.1, pytest-8.3.3, pluggy-1.5.0
 rootdir: /home/runner/work/advent-of-code-2024/advent-of-code-2024
 configfile: pytest.ini
 collecting ... 
-collected 31 items / 9 deselected / 22 selected                                
+collected 46 items / 12 deselected / 34 selected                               
 
-tests/test_p01.py ..                                                     [  9%]
-tests/test_p02.py ..                                                     [ 18%]
-tests/test_p03.py ..                                                     [ 27%]
-tests/test_p04.py ..                                                     [ 36%]
-tests/test_p05.py ..                                                     [ 45%]
-tests/test_p06.py ....                                                   [ 63%]
-tests/test_p07.py ..                                                     [ 72%]
-tests/test_p08.py ..                                                     [ 81%]
-tests/test_p09.py ....                                                   [100%]
+tests/test_p01.py ..                                                     [  5%]
+tests/test_p02.py ..                                                     [ 11%]
+tests/test_p03.py ..                                                     [ 17%]
+tests/test_p04.py ..                                                     [ 23%]
+tests/test_p05.py ..                                                     [ 29%]
+tests/test_p06.py ....                                                   [ 41%]
+tests/test_p07.py ..                                                     [ 47%]
+tests/test_p08.py ..                                                     [ 52%]
+tests/test_p09.py ....                                                   [ 64%]
+tests/test_p10.py ..                                                     [ 70%]
+tests/test_p11.py ..                                                     [ 76%]
+tests/test_p12.py ........                                               [100%]
 
-======================= 22 passed, 9 deselected in 0.21s =======================
+====================== 34 passed, 12 deselected in 0.23s =======================
 
 performance..............................................................Passed
 - hook id: performance
-- duration: 16.45s
+- duration: 16.97s
 
 ============================= test session starts ==============================
 platform linux -- Python 3.13.1, pytest-8.3.3, pluggy-1.5.0
 rootdir: /home/runner/work/advent-of-code-2024/advent-of-code-2024
 configfile: pytest.ini
 collecting ... 
-collected 31 items / 22 deselected / 9 selected                                
+collected 46 items / 34 deselected / 12 selected                               
 
-tests/test_performance.py .........
+tests/test_performance.py ............
 ────────────────────────────────── Run Times ───────────────────────────────────
 p01  0.04
 p02  0.05
 p03  0.04
-p04 ▇ 0.08
+p04 ▇ 0.07
 p05  0.04
-p06 ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 6.69
-p07 ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 8.64
+p06 ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 6.63
+p07 ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 8.74
 p08  0.04
-p09 ▇ 0.09
+p09 ▇ 0.10
+p10  0.05
+p11 ▇▇ 0.24
+p12 ▇▇ 0.20
 
 
-====================== 9 passed, 22 deselected in 15.79s =======================
+====================== 12 passed, 34 deselected in 16.33s ======================
 ```
