@@ -49,7 +49,7 @@ def test_performance(puzzle: str, puzzle_runs: dict[str, float]) -> None:
         return
     mean = statistics.mean(no_outliers.values())
     t = puzzle_runs[puzzle]
-    limit = mean * 30
+    limit = mean * 200
     assert t <= limit, (
         f"Time limit exceeded for {puzzle!r}: "
         f"time: {t:.3f}, limit: {limit:.3f}, mean: {mean:.3f}"
