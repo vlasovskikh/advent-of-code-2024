@@ -12,37 +12,7 @@ class Tile(enum.StrEnum):
     NEW_OBSTACLE = "O"
 
 
-class Dir(enum.Enum):
-    UP = enum.auto()
-    RIGHT = enum.auto()
-    DOWN = enum.auto()
-    LEFT = enum.auto()
-
-    @property
-    def turn90(self) -> Dir:
-        match self:
-            case Dir.UP:
-                return Dir.RIGHT
-            case Dir.RIGHT:
-                return Dir.DOWN
-            case Dir.DOWN:
-                return Dir.LEFT
-            case Dir.LEFT:
-                return Dir.UP
-
-    def __repr__(self):
-        match self:
-            case Dir.UP:
-                return "^"
-            case Dir.RIGHT:
-                return ">"
-            case Dir.DOWN:
-                return "v"
-            case Dir.LEFT:
-                return "<"
-
-
-type Pos = tuple[utils.Coord, Dir]
+type Pos = tuple[utils.Coord, utils.Dir]
 
 
 class Lab(utils.Grid[Tile]):
@@ -52,19 +22,19 @@ class Lab(utils.Grid[Tile]):
     def step(self, pos: Pos) -> Pos:
         c, d = pos
         match d:
-            case Dir.UP:
+            case utils.Dir.UP:
                 return self.step_in_dir(c, d, (c[0] - 1, c[1]))
-            case Dir.RIGHT:
+            case utils.Dir.RIGHT:
                 return self.step_in_dir(c, d, (c[0], c[1] + 1))
-            case Dir.DOWN:
+            case utils.Dir.DOWN:
                 return self.step_in_dir(c, d, (c[0] + 1, c[1]))
-            case Dir.LEFT:
+            case utils.Dir.LEFT:
                 return self.step_in_dir(c, d, (c[0], c[1] - 1))
             case _:
                 raise ValueError(f"Unknown direction: {d}")
 
     def step_in_dir(
-        self, coord: utils.Coord, direction: Dir, new_coord: utils.Coord
+        self, coord: utils.Coord, direction: utils.Dir, new_coord: utils.Coord
     ) -> Pos:
         if new_coord in self and self[new_coord] == Tile.OBSTACLE:
             direction = direction.turn90
@@ -83,7 +53,7 @@ class Lab(utils.Grid[Tile]):
 
 
 def guard_path(lab: Lab) -> list[Pos]:
-    path, _ = lab.path((lab.find_guard(), Dir.UP))
+    path, _ = lab.path((lab.find_guard(), utils.Dir.UP))
     return path
 
 

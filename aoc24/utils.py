@@ -1,5 +1,6 @@
 from __future__ import annotations
 import dataclasses
+import enum
 import itertools
 import os
 import typing
@@ -113,3 +114,45 @@ class Grid[T]:
     def __contains__(self, coord: Coord) -> bool:
         lines, positions = self.size()
         return 0 <= coord[0] < lines and 0 <= coord[1] < positions
+
+
+class Dir(enum.IntEnum):
+    UP = enum.auto()
+    RIGHT = enum.auto()
+    DOWN = enum.auto()
+    LEFT = enum.auto()
+
+    @property
+    def turn90(self) -> Dir:
+        match self:
+            case Dir.UP:
+                return Dir.RIGHT
+            case Dir.RIGHT:
+                return Dir.DOWN
+            case Dir.DOWN:
+                return Dir.LEFT
+            case Dir.LEFT:
+                return Dir.UP
+
+    @property
+    def turn270(self) -> Dir:
+        match self:
+            case Dir.UP:
+                return Dir.LEFT
+            case Dir.RIGHT:
+                return Dir.UP
+            case Dir.DOWN:
+                return Dir.RIGHT
+            case Dir.LEFT:
+                return Dir.DOWN
+
+    def __repr__(self):
+        match self:
+            case Dir.UP:
+                return "^"
+            case Dir.RIGHT:
+                return ">"
+            case Dir.DOWN:
+                return "v"
+            case Dir.LEFT:
+                return "<"
