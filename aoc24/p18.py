@@ -55,8 +55,7 @@ def shortest_path(*, size: utils.Coord, coords: list[utils.Coord]) -> int | None
 
 def bisect_key(path: Path) -> bool:
     """Returns False when there is a path and True if there is no path."""
-    memory = MemorySpace.create(size=path.size, coords=path.coords)
-    return memory.shortest_path() is None
+    return shortest_path(size=path.size, coords=path.coords) is None
 
 
 def first_blocking_coord(*, size: utils.Coord, coords: list[utils.Coord]) -> str:
