@@ -55,6 +55,7 @@ class Grid[T]:
     def __post_init__(self) -> None:
         self._size = len(self.data), len(self.data[0])
 
+    @property
     def size(self) -> Coord:
         return self._size
 
@@ -112,7 +113,7 @@ class Grid[T]:
         return "\n".join("".join(str(x) for x in line) for line in self.data)
 
     def __contains__(self, coord: Coord) -> bool:
-        lines, positions = self.size()
+        lines, positions = self.size
         return 0 <= coord[0] < lines and 0 <= coord[1] < positions
 
 

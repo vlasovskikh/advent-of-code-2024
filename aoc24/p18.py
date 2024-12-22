@@ -14,7 +14,7 @@ class Cell(enum.StrEnum):
 class MemorySpace(utils.Grid[Cell]):
     def shortest_path(self) -> int | None:
         start = (0, 0)
-        stop = utils.sub_coord(self.size(), (1, 1))
+        stop = utils.sub_coord(self.size, (1, 1))
         best_score: dict[utils.Coord, int] = {}
         heap: list[tuple[int, utils.Coord]] = []
         heapq.heappush(heap, (0, start))
