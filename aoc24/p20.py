@@ -37,14 +37,14 @@ class Track(utils.Grid[Cell]):
         """Find all cheat coordinates not farther than `distance`."""
         sx, sy = start
         cheats: set[Cheat] = set()
-        for x in range(sx - distance, sx + distance + 1):
-            for y in range(sy - distance, sy + distance + 1):
+        size_x, size_y = self.size
+        for x in range(max(sx - distance, 0), min(sx + distance + 1, size_x)):
+            for y in range(max(sy - distance, 0), min(sy + distance + 1, size_y)):
                 end = x, y
                 if (
                     end != start
-                    and end in self
-                    and coord_distance(start, end) <= distance
                     and self[end] != Cell.WALL
+                    and coord_distance(start, end) <= distance
                 ):
                     cheats.add((start, end))
         return cheats
