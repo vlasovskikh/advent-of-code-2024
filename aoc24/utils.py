@@ -116,6 +116,9 @@ class Grid[T]:
         lines, positions = self.size
         return 0 <= coord[0] < lines and 0 <= coord[1] < positions
 
+    def first(self, value: T) -> Coord:
+        return next(c for c in self if self[c] == value)
+
 
 class Dir(enum.IntEnum):
     UP = enum.auto()
