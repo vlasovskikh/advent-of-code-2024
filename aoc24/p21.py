@@ -1,9 +1,6 @@
 from __future__ import annotations
-import collections
-import dataclasses
 import functools
-import heapq
-import itertools
+import typing
 from aoc24 import utils
 
 
@@ -27,110 +24,65 @@ DIR_DATA = [
 ]
 
 
-@dataclasses.dataclass
-class Keypad:
-    nested: Keypad | None
+class Keypad(typing.NamedTuple):
+    next: Keypad | None
     is_num: bool
 
-    def how_to_type(self, sequence: str) -> set[str]:
-        result: set[str] = set()
-        if self.nested:
-            sequences = ["A" + s for s in self.nested.how_to_type(sequence)]
-        else:
-            sequences = [sequence]
-        for sequence in sequences:
-            segments: list[set[str]] = []
-            for c1, c2 in utils.sliding_window(sequence, 2):
-                segments.append(shortest_paths(c1, c2, self.is_num))
-            for comb in itertools.product(*segments):
-                result.add("".join(comb))
-        if len(result) == 0:
-            return result
-        min_len = min(len(s) for s in result)
-        return {s for s in result if len(s) == min_len}
+    @functools.cache
+    def keys_len(self, sequence: str) -> int:
+        sequence = "A" + sequence
+        result = 0
+        for c1, c2 in utils.sliding_window(sequence, 2):
+            paths = shortest_paths(c1, c2, self.is_num)
+            result += min(self.next.keys_len(p) if self.next else len(p) for p in paths)
+        return result
 
 
-@functools.cache
 def shortest_paths(start: str, end: str, is_num: bool) -> set[str]:
     grid = utils.Grid(NUM_DATA if is_num else DIR_DATA)
     c_start = grid.first(start)
     c_end = grid.first(end)
-    traceback = shortest_paths_traceback(grid, c_start)
-    paths = all_paths(c_start, c_end, traceback)
-    return {path_to_keys(path) for path in paths}
+    d_line, d_col = utils.sub_coord(c_end, c_start)
+    path_line = ("v" if d_line > 0 else "^") * abs(d_line)
+    path_col = (">" if d_col > 0 else "<") * abs(d_col)
+    paths = {
+        path_line + path_col,
+        path_col + path_line,
+    }
+    return {p + "A" for p in paths if path_exists(p, grid, c_start)}
 
 
-def path_to_keys(path: list[utils.Coord]) -> str:
-    keys: list[str] = []
-    for c1, c2 in utils.sliding_window(path, 2):
-        diff = utils.sub_coord(c2, c1)
-        match diff:
-            case (0, 1):
-                key = ">"
-            case (0, -1):
-                key = "<"
-            case (1, 0):
-                key = "v"
-            case (-1, 0):
-                key = "^"
+def path_exists(path: str, grid: utils.Grid[str], start: utils.Coord) -> bool:
+    coord = start
+    for c in path:
+        match c:
+            case "<":
+                diff = 0, -1
+            case ">":
+                diff = 0, 1
+            case "^":
+                diff = -1, 0
+            case "v":
+                diff = 1, 0
             case _:
-                raise ValueError(f"Unsupported diff: {diff}")
-        keys.append(key)
-    keys.append("A")
-    return "".join(keys)
+                raise ValueError(f"Unknown symbol {c!r} in path {path!r}")
+        coord = utils.add_coord(coord, diff)
+        if coord not in grid or grid[coord] == ".":
+            return False
+    return True
 
 
-def all_paths(
-    c_start: utils.Coord,
-    c_end: utils.Coord,
-    traceback: dict[utils.Coord, set[utils.Coord]],
-) -> list[list[utils.Coord]]:
-
-    paths: list[list[utils.Coord]] = []
-    stack: list[tuple[utils.Coord, list[utils.Coord]]] = [(c_end, [])]
-    while stack:
-        coord, path = stack.pop()
-        path.append(coord)
-        if coord == c_start:
-            paths.append(list(reversed(path)))
-        for prev in traceback[coord]:
-            path = path.copy()
-            stack.append((prev, path))
-
-    return paths
+def total_complexity(sequences: list[str], dir_keypads: int) -> int:
+    return sum(code_complexity(s, dir_keypads) for s in sequences)
 
 
-def shortest_paths_traceback(
-    grid: utils.Grid[str],
-    c_start: utils.Coord,
-) -> dict[utils.Coord, set[utils.Coord]]:
-    best_score: dict[utils.Coord, int] = {}
-    traceback: dict[utils.Coord, set[utils.Coord]] = collections.defaultdict(set)
-    heap: list[tuple[int, utils.Coord, utils.Coord]] = [(0, c_start, c_start)]
-
-    while heap:
-        score, coord, prev = heapq.heappop(heap)
-        if coord in best_score and score > best_score[coord]:
-            continue
-        best_score[coord] = score
-        if prev != coord:
-            traceback[coord].add(prev)
-        for n in grid.cross_neighbors(coord):
-            if grid[n] != ".":
-                heapq.heappush(heap, (score + 1, n, coord))
-
-    return traceback
-
-
-def total_complexity(sequences: list[str], prefix: str = "A") -> int:
-    return sum(code_complexity(prefix + s) for s in sequences)
-
-
-def code_complexity(sequence: str) -> int:
-    radiation = Keypad(nested=None, is_num=True)
-    frozen = Keypad(nested=radiation, is_num=False)
-    historic = Keypad(nested=frozen, is_num=False)
-    shortest = min(len(keys) for keys in historic.how_to_type(sequence))
+def code_complexity(sequence: str, dir_keypads: int) -> int:
+    last = Keypad(next=None, is_num=False)
+    keypad = last
+    for _ in range(dir_keypads - 1):
+        keypad = Keypad(next=keypad, is_num=False)
+    first = Keypad(next=keypad, is_num=True)
+    shortest = first.keys_len(sequence)
     num = numeric_part(sequence)
     return shortest * num
 
@@ -144,10 +96,9 @@ def parse_input(lines: list[str]) -> list[str]:
 
 
 def main() -> None:
-    # 196582: too high
-    # 188398
     sequences = parse_input(utils.read_input_lines(__file__))
-    print(total_complexity(sequences))
+    print(total_complexity(sequences, 2))
+    print(total_complexity(sequences, 25))
 
 
 if __name__ == "__main__":

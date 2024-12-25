@@ -10,7 +10,7 @@ def test_example_1() -> None:
 379A
 """.strip().splitlines()
     sequences = p21.parse_input(lines)
-    assert p21.total_complexity(sequences) == 126384
+    assert p21.total_complexity(sequences, 2) == 126384
 
 
 def test_small_1() -> None:
@@ -18,7 +18,7 @@ def test_small_1() -> None:
 029A
 """.strip().splitlines()
     sequences = p21.parse_input(lines)
-    assert p21.total_complexity(sequences) == 68 * 29
+    assert p21.total_complexity(sequences, 2) == 68 * 29
 
 
 def test_small_5() -> None:
@@ -26,4 +26,4 @@ def test_small_5() -> None:
 379A
 """.strip().splitlines()
     sequences = p21.parse_input(lines)
-    assert p21.total_complexity(sequences) == 64 * 379
+    assert p21.total_complexity(sequences, 2) == 64 * 379
